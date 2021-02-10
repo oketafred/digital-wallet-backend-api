@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,9 +30,11 @@ class AuthController extends Controller
     {        
         if( Auth::attempt(['phone_number'=>$request->phone_number, 'password'=>$request->password]) ) {
             $user = Auth::user();
-            $token = $user->createToken($user->email.'-'.now())->accessToken;
+            $token = $user->createToken($user->email.'-'.now());
             return response()->json([
-                'token' => $token,
+                'access_token' => $token->accessToken,
+                'token_type' => 'Bearer',
+                'expires_at' => Carbon::parse($token->token->expires_at)->toDateTimeString()
             ]);
         }
         return response()->json(['error' => 'Invalid Credentials']);
