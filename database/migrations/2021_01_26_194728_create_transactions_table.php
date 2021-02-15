@@ -19,6 +19,11 @@ class CreateTransactionsTable extends Migration
             $table->double('amount');
             $table->string('description');
             $table->string('transaction_type');
+            $table->enum('transaction_status', ['Pending', 'Failed', 'Success'])->default('Pending');
+            $table->string('phone');
+            $table->text('reference');
+            $table->text('reason');
+            
             $table->timestamps();
 
             $table->foreign('wallet_no')->references('wallet_no')->on('wallets');
