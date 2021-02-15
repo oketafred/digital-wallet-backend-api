@@ -21,5 +21,7 @@ Route::group(['prefix' => 'auth'], function() {
   Route::post('/register', [AuthController::class, 'register']);
 });
 
-// Deposit
-Route::post('/mmdeposit', [MobileMoneyDepositController::class, 'mmdeposit']);
+Route::group(['middleware' => 'auth:api'], function() {
+  // Deposit
+  Route::post('/mmdeposit', [MobileMoneyDepositController::class, 'mmdeposit']);
+});
