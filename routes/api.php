@@ -16,12 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => 'auth'], function() {
+Route::group(['prefix' => 'auth'], function () {
   Route::post('/login', [AuthController::class, 'login']);
   Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::group(['middleware' => 'auth:api'], function() {
+Route::group(['middleware' => 'auth:api'], function () {
+  Route::post('/pincheck', [AuthController::class, 'pincheck']);
   // Deposit
   Route::post('/mmdeposit', [MobileMoneyDepositController::class, 'mmdeposit']);
 });

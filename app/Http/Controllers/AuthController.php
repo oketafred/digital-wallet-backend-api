@@ -14,20 +14,21 @@ use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpFoundation\Response;
 use Webpatser\Uuid\Uuid;
 use Propaganistas\LaravelPhone\PhoneNumber;
+use Symfony\Component\Console\Input\Input;
 
 class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $registration = DB::transaction(function () use($request) {
+        $registration = DB::transaction(function () use ($request) {
             $user = User::create([
-                'first_name'    => $request->input('first_name'), 
-                'last_name'     => $request->input('last_name'), 
-                'email'         => $request->input('email'), 
+                'first_name'    => $request->input('first_name'),
+                'last_name'     => $request->input('last_name'),
+                'email'         => $request->input('email'),
                 'phone_number'  => (string) PhoneNumber::make($request->input('phone_number'), 'UG')->formatE164(),
                 'password'      => Hash::make($request->input('password'))
             ]);
-            
+
             $wallet = Wallet::create([
                 'user_id' => $user->id,
                 'wallet_no' => Uuid::generate(),
@@ -38,11 +39,12 @@ class AuthController extends Controller
         return response()->json($registration['user']);
     }
 
-    public function login(LoginRequest $request) 
-    {        
-        if( Auth::attempt(['phone_number'=>$request->phone_number, 'password'=>$request->password]) ) {
+    public function login(LoginRequest $request)
+    {
+        if (Auth::attempt(['phone_number' => $request->phone_number, 'password' => $request->password])) {
             $user = Auth::user();
-            $token = $user->createToken($user->email.'-'.now());
+
+            Auth::$token = $user->createToken($user->email . '-' . now());
             return response()->json([
                 'access_token' => $token->accessToken,
                 'token_type' => 'Bearer',
@@ -50,5 +52,18 @@ class AuthController extends Controller
             ]);
         }
         return response()->json(['error' => 'Invalid Credentials']);
+    }
+
+    public function pincheck(Request $request)
+    {
+        if (Hash::check($request->input('pin'), Auth::user()->password)) {
+            $user = Auth::user();
+
+            return response()->json([
+                "user" => $user,
+                "isPinActive" => true
+            ]);
+        }
+        return response()->json(['error' => 'Wrong PIN']);
     }
 }
