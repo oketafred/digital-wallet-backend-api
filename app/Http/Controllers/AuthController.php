@@ -44,7 +44,7 @@ class AuthController extends Controller
         if (Auth::attempt(['phone_number' => $request->phone_number, 'password' => $request->password])) {
             $user = Auth::user();
 
-            Auth::$token = $user->createToken($user->email . '-' . now());
+            $token = $user->createToken($user->email . '-' . now());
             return response()->json([
                 'access_token' => $token->accessToken,
                 'token_type' => 'Bearer',
