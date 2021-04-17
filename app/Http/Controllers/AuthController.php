@@ -18,6 +18,23 @@ use Symfony\Component\Console\Input\Input;
 
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     * path="/auth/register",
+     * summary="Register",
+     * description="Register with name, email, password",
+     * operationId="register",
+     * summary="Register a new user",
+     * tags={"Authentication"},
+     * @OA\Response(
+     *    response=422,
+     *    description="Sorry, wrong email address or password. Please try again",
+     *    @OA\JsonContent(
+     *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+     *        )
+     *     )
+     * )
+     */
     public function register(RegisterRequest $request)
     {
         $registration = DB::transaction(function () use ($request) {
@@ -39,6 +56,23 @@ class AuthController extends Controller
         return response()->json($registration['user']);
     }
 
+    /**
+     * @OA\Post(
+     * path="/auth/login",
+     * summary="Login",
+     * description="Login user with name, email, password",
+     * operationId="login",
+     * summary="Login a new user",
+     * tags={"Authentication"},
+     * @OA\Response(
+     *    response=422,
+     *    description="Sorry, wrong email address or password. Please try again",
+     *    @OA\JsonContent(
+     *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+     *        )
+     *     )
+     * )
+     */
     public function login(LoginRequest $request)
     {
         if (Auth::attempt(['phone_number' => $request->phone_number, 'password' => $request->password])) {
@@ -54,6 +88,24 @@ class AuthController extends Controller
         return response()->json(['error' => 'Invalid Credentials']);
     }
 
+    /**
+     * @OA\Post(
+     * path="/pincheck",
+     * summary="Pincheck",
+     * description="Pincheck",
+     * operationId="pincheck",
+     * summary="Pincheck",
+     * security={},
+     * tags={"Authentication"},
+     * @OA\Response(
+     *    response=422,
+     *    description="Sorry, wrong email address or password. Please try again",
+     *    @OA\JsonContent(
+     *       @OA\Property(property="message", type="string", example="Sorry, wrong email address or password. Please try again")
+     *        )
+     *     )
+     * )
+     */
     public function pincheck(Request $request)
     {
         if (Hash::check($request->input('pin'), Auth::user()->password)) {
